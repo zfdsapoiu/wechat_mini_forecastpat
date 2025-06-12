@@ -1,0 +1,160 @@
+/**index.wxss**/
+.scrollarea {
+  height: 100vh;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx;
+  box-sizing: border-box;
+  background-color: #f0f0f0; /* 淡灰色背景 */
+  min-height: 100%;
+}
+
+.userinfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30rpx;
+  padding: 20rpx;
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.avatar-wrapper {
+  padding: 0;
+  margin: 20rpx;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4rpx solid #ffb3a7; /* 宠物主题色边框 */
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+}
+
+.userinfo-avatar {
+  width: 128rpx;
+  height: 128rpx;
+  margin: 20rpx;
+  border-radius: 50%;
+  border: 4rpx solid #ffb3a7;
+  overflow: hidden;
+}
+
+.userinfo-nickname {
+  color: #333;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.nickname-wrapper {
+  display: flex;
+  align-items: center;
+  margin-top: 20rpx;
+}
+
+.nickname-label {
+  margin-right: 10rpx;
+  font-size: 28rpx;
+  color: #555;
+}
+
+.nickname-input {
+  border: 1rpx solid #ddd;
+  padding: 10rpx 15rpx;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  flex-grow: 1;
+}
+
+.input-section, .pet-feature-section {
+  width: 100%;
+  margin-bottom: 30rpx;
+  padding: 30rpx 20rpx;
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #ff8a5c; /* 宠物主题色 */
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+.picker, .input-group, .input {
+  background-color: #f9f9f9;
+  padding: 20rpx;
+  border-radius: 10rpx;
+  border: 1rpx solid #eee;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.input-tip {
+  font-size: 24rpx;
+  color: #888;
+  margin-top: 10rpx;
+  padding: 0 10rpx;
+  line-height: 1.4;
+  margin-bottom: 20rpx;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+}
+
+.input-label {
+  font-size: 28rpx;
+  color: #555;
+  margin-right: 15rpx;
+  min-width: 80rpx; /* 确保标签对齐 */
+}
+
+.input-field {
+  flex-grow: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.placeholder-style {
+  color: #aaa;
+}
+
+.pet-btn {
+  width: 80%;
+  background-color: #ff8a5c; /* 宠物主题色 */
+  color: white;
+  border-radius: 50rpx; /* 圆角按钮 */
+  padding: 20rpx 0;
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-top: 20rpx;
+  box-shadow: 0 4rpx 10rpx rgba(255, 138, 92, 0.4);
+  transition: background-color 0.2s ease;
+}
+
+.pet-btn:active {
+  background-color: #e67043; /* 点击效果 */
+}
+
+.disabled-btn {
+  background-color: #ccc !important;
+  color: #999 !important;
+  box-shadow: none !important;
+}
+
+.disabled-btn:active {
+  background-color: #ccc !important;
+}

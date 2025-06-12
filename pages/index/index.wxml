@@ -1,0 +1,58 @@
+<!--index.wxml-->
+<scroll-view class="scrollarea" scroll-y>
+  <view class="container">
+    <!-- 用户信息区块 -->
+    <view class="userinfo">
+      <block wx:if="{{canIUseNicknameComp && !hasUserInfo}}">
+        <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+          <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
+        </button>
+        <view class="nickname-wrapper">
+          <text class="nickname-label">宠物名字</text>
+          <input type="nickname" class="nickname-input" placeholder="请输入宠物名字" bind:change="onInputChange" />
+        </view>
+      </block>
+      <block wx:elif="{{!hasUserInfo}}">
+        <button wx:if="{{canIUseGetUserProfile}}" bindtap="getUserProfile"> 获取头像昵称 </button>
+        <view wx:else> 请使用2.10.4及以上版本基础库 </view>
+      </block>
+      <block wx:else>
+        <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+      </block>
+    </view>
+    <!-- 登录后显示的宠物信息输入区块 -->
+    <block wx:if="{{hasUserInfo}}">
+      <!-- 新增宠物信息输入区块 -->
+      <view class="input-section">
+        <text class="section-title">📅 宠物生日</text>
+        <input class="input" placeholder="请输入宠物生日" bindinput="bindBirthDateInput"></input>
+        <view class="input-tip">比如2020年1月1，10点01分出生的宠物就是'202001011001'，如果不知道时间就填写到日期</view>
+      </view>
+      
+      <!-- 宠物类型品种输入 -->
+      <view class="pet-feature">
+        <text class="section-title">🐶 宠物类型品种</text>
+        <input class="input" placeholder="请输入宠物类型品种" bindinput="bindPetTypeInput"></input>
+      </view>
+      
+      <!-- 样貌选择增加宠物图标 -->
+      <view class="pet-feature">
+        <text class="section-title">🐾 外貌特征</text>
+        <input class="input" placeholder="请输入宠物外贸特征" bindinput="bindFurTypeInput"></input>
+      </view>
+      
+      <!-- 算命按钮样式优化 -->
+      <button class="pet-btn" bindtap="calculate">
+        开始算命
+      </button>
+    </block>
+    
+    <!-- 未登录时显示的算命按钮 -->
+    <block wx:else>
+      <button class="pet-btn disabled-btn" bindtap="showLoginTip">
+        开始算命
+      </button>
+    </block>
+  </view>
+</scroll-view>

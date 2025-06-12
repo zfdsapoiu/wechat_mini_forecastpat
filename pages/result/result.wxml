@@ -1,0 +1,30 @@
+<!--result.wxml-->
+<scroll-view class="scrollarea" scroll-y>
+  <view class="container">
+    <!-- 返回按钮 -->
+    <view class="back-button" bindtap="goBack">
+      <text class="back-text">← 返回</text>
+    </view>
+    
+    <!-- 算命结果标题 -->
+    <view class="result-header">
+      <text class="result-title">🔮 {{petName}}的命理报告</text>
+    </view>
+    
+    <!-- 加载状态 -->
+    <view class="loading" wx:if="{{loading}}">
+      <text class="loading-text">正在为您的宠物算命中...</text>
+    </view>
+    
+    <!-- 结果内容 -->
+    <view class="result-content" wx:if="{{!loading && result}}">
+      <rich-text nodes="{{result}}"></rich-text>
+    </view>
+    
+    <!-- 错误信息 -->
+    <view class="error-message" wx:if="{{!loading && error}}">
+      <text class="error-text">{{error}}</text>
+      <button class="retry-btn" bindtap="retry">重试</button>
+    </view>
+  </view>
+</scroll-view>

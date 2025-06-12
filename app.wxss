@@ -1,0 +1,32 @@
+/* 主色调调整为宠物友好色系 */
+page {
+  background-color: #FFF9E6; /* 浅黄色背景 */
+  font-family: 'Microsoft YaHei';
+}
+
+/* 宠物主题按钮样式 */
+.pet-btn {
+  background-color: #8BC34A; /* 浅绿色 */
+  border-radius: 20rpx;
+  color: white;
+  margin: 30rpx;
+  box-shadow: 0 4rpx 8rpx rgba(139, 195, 74, 0.3);
+}
+
+/* 添加宠物爪印图标样式 */
+.paw-icon {
+  width: 48rpx;
+  height: 48rpx;
+  vertical-align: middle;
+  margin-right: 16rpx;
+}
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 200rpx 0;
+  box-sizing: border-box;
+}
