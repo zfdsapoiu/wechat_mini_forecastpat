@@ -7,7 +7,7 @@ function getFormattedDate(date) {
   const day = date.getDate().toString().padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
-
+//testgit
 Page({
   data: {
     // motto: 'Hello World', // Removed motto
