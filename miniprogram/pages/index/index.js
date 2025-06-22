@@ -20,13 +20,59 @@ Page({
     canIUseNicknameComp: wx.canIUse('input.type.nickname'),
     birthDate: '', // Added for date picker
     currentDate: getFormattedDate(new Date()), // Added for date picker end range
+    petName: '', // 宠物名字
     petType: '', // Added for pet type input
     petAppearance: '', // Added for pet appearance input
     furType: '', // 添加毛发类型
   },
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad: function (options) {
+    this.checkUserLogin();
+  },
+
+  /**
+   * 检查用户登录状态
+   * 从本地存储获取用户信息，不自动跳转
+   */
+  checkUserLogin() {
+    try {
+      const userInfo = wx.getStorageSync('userInfo');
+      const openid = wx.getStorageSync('openid');
+      
+      if (userInfo && openid) {
+        console.log('用户已登录', userInfo);
+        this.setData({
+          userInfo: userInfo,
+          hasUserInfo: true
+        });
+      } else {
+        console.log('用户未登录');
+        this.setData({
+          hasUserInfo: false
+        });
+      }
+    } catch (error) {
+      console.error('检查登录状态失败', error);
+      this.setData({
+        hasUserInfo: false
+      });
+    }
+  },
   bindViewTap() {
     wx.navigateTo({
       url: '../logs/logs'
+    })
+  },
+
+  /**
+   * 返回登录页面
+   */
+  goToLogin() {
+    wx.navigateTo({
+      url: '/pages/login/login'
     })
   },
   onChooseAvatar(e) {
@@ -56,6 +102,16 @@ Page({
         })
       }
     })
+  },
+
+  /**
+   * 宠物名字输入处理
+   * @param {Object} e 事件对象
+   */
+  bindPetNameInput: function(e) {
+    this.setData({
+      petName: e.detail.value
+    });
   },
 
   // 用于宠物生日输入和验证
@@ -90,6 +146,14 @@ Page({
     // 检查是否已登录
     if (!this.data.hasUserInfo) {
       this.showLoginTip();
+      return;
+    }
+    
+    if (!this.data.petName) {
+      wx.showToast({
+        title: '请输入宠物名字',
+        icon: 'none'
+      });
       return;
     }
     
@@ -128,10 +192,12 @@ Page({
     }
     // 收集宠物数据，包含宠物名字
     const petData = {
+      petName: this.data.petName,
       nickName: this.data.userInfo.nickName,
       birthDate: this.data.birthDate,
       petType: this.data.petType,
-      petAppearance: this.data.furType
+      petAppearance: this.data.petAppearance,
+      furType: this.data.furType
     };
     
     // 跳转到结果页面

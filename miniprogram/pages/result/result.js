@@ -1,47 +1,41 @@
 // result.js
 Page({
   data: {
-    loading: true,
+    loading: false,
     result: '',
     error: '',
     petName: '',
-    petData: null,
-    apiLogs: [] // 存储API调用日志
+    petData: {},
+    apiLogs: []
   },
 
   onLoad: function(options) {
-    // 从本地存储恢复API调用日志
-    try {
-      const savedLogs = wx.getStorageSync('api_debug_logs');
-      if (savedLogs && Array.isArray(savedLogs)) {
-        this.setData({
-          apiLogs: savedLogs
-        });
-        console.log('已恢复', savedLogs.length, '条API调用日志');
-      }
-    } catch (e) {
-      console.warn('恢复API日志失败:', e);
-    }
+    console.log('Result page loaded with options:', options);
     
-    // 获取传递的宠物数据
     if (options.petData) {
       try {
         const petData = JSON.parse(decodeURIComponent(options.petData));
+        console.log('Parsed pet data:', petData);
+        
         this.setData({
           petData: petData,
-          petName: petData.nickName || '您的宠物' // 提取宠物名字
+          petName: petData.petName || '您的宠物',
+          loading: true
         });
-        this.callFortuneTellingAPI();
-      } catch (e) {
+        
+        // 调用算命API
+        this.callFortuneTellingAPI(petData);
+      } catch (error) {
+        console.error('解析宠物数据失败:', error);
         this.setData({
-          loading: false,
-          error: '数据解析失败，请重试'
+          error: '数据解析失败，请重试',
+          loading: false
         });
       }
     } else {
       this.setData({
-        loading: false,
-        error: '缺少宠物信息，请重新输入'
+        error: '缺少宠物数据',
+        loading: false
       });
     }
   },
@@ -128,6 +122,9 @@ Page({
             loading: false,
             result: this.markdownToHtml(result)
           });
+          
+          // 保存算命记录
+          this.saveRecord(result);
         } else {
           this.setData({
             loading: false,
@@ -299,5 +296,44 @@ Page({
   // 返回上一页
   goBack: function() {
     wx.navigateBack();
-  }
+  },
+
+  // 保存算命记录
+  saveRecord: function(result) {
+    try {
+      const petData = this.data.petData;
+      const record = {
+        id: Date.now(), // 使用时间戳作为唯一ID
+        petName: petData.nickName || '未命名宠物',
+        petType: petData.petType || '',
+        birthDate: petData.birthDate || '',
+        appearance: petData.petAppearance || '',
+        furType: petData.furType || '',
+        result: result,
+        createTime: new Date().toISOString(),
+        createTimeFormatted: new Date().toLocaleString('zh-CN'),
+        timestamp: Date.now() // 添加时间戳字段
+      };
+      
+      // 获取现有记录
+      let records = wx.getStorageSync('petFortune_records') || [];
+      
+      // 添加新记录到开头
+      records.unshift(record);
+      
+      // 限制记录数量，最多保存100条
+      if (records.length > 100) {
+        records = records.slice(0, 100);
+      }
+      
+      // 保存到本地存储
+      wx.setStorageSync('petFortune_records', records);
+      
+      console.log('算命记录已保存:', record);
+    } catch (error) {
+      console.error('保存算命记录失败:', error);
+    }
+  },
+
+
 });

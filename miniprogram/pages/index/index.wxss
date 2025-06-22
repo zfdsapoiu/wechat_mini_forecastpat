@@ -13,6 +13,26 @@
   min-height: 100%;
 }
 
+/* 页面标题样式 */
+.page-title {
+  text-align: center;
+  margin: 40rpx 0;
+}
+
+.title-text {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.subtitle-text {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+}
+
 .userinfo {
   display: flex;
   flex-direction: column;
@@ -25,35 +45,33 @@
   width: 100%;
 }
 
-.avatar-wrapper {
-  padding: 0;
-  margin: 20rpx;
-  width: 160rpx;
-  height: 160rpx;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 4rpx solid #ffb3a7; /* 宠物主题色边框 */
-}
-
-.avatar {
-  width: 100%;
-  height: 100%;
-}
-
-.userinfo-avatar {
-  width: 128rpx;
-  height: 128rpx;
-  margin: 20rpx;
-  border-radius: 50%;
-  border: 4rpx solid #ffb3a7;
-  overflow: hidden;
-}
-
-.userinfo-nickname {
-  color: #333;
+/* 登录提示样式 */
+.login-tip {
+  color: #ff6b6b;
   font-size: 32rpx;
-  font-weight: bold;
+  padding: 20rpx;
+  background-color: #fff5f5;
+  border-radius: 10rpx;
+  border: 2rpx solid #ffebee;
+  margin-bottom: 20rpx;
 }
+
+/* 返回登录页按钮样式 */
+.back-to-login-btn {
+  background-color: #667eea;
+  color: white;
+  border-radius: 25rpx;
+  padding: 20rpx 40rpx;
+  font-size: 28rpx;
+  border: none;
+  margin-top: 20rpx;
+}
+
+.back-to-login-btn:hover {
+  background-color: #5a6fd8;
+}
+
+/* 移除了用户头像和昵称相关样式，这些功能已转移到登录页面 */
 
 .nickname-wrapper {
   display: flex;

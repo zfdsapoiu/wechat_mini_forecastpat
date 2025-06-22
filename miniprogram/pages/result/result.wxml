@@ -6,9 +6,9 @@
       <text class="back-text">← 返回</text>
     </view>
     
-    <!-- 算命结果标题 -->
+    <!-- 标题 -->
     <view class="result-header">
-      <text class="result-title">🔮 {{petName}}的命理报告</text>
+      <text class="result-title">🔮 {{petName}}的算命结果</text>
     </view>
     
     <!-- 加载状态 -->

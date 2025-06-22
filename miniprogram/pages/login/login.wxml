@@ -1,0 +1,41 @@
+<!--login.wxml-->
+<view class="container">
+  <!-- 欢迎标题 -->
+  <view class="welcome-section">
+    <text class="welcome-title">🐾 宠物算命师</text>
+    <text class="welcome-subtitle">为您的爱宠预测未来</text>
+  </view>
+
+  <!-- 小程序介绍 -->
+  <view class="intro-tips">
+    <view class="tip-item">
+      <text class="tip-icon">🔮</text>
+      <text class="tip-text">专业宠物八字算命</text>
+    </view>
+    <view class="tip-item">
+      <text class="tip-icon">⭐</text>
+      <text class="tip-text">精准分析宠物性格</text>
+    </view>
+    <view class="tip-item">
+      <text class="tip-icon">🎯</text>
+      <text class="tip-text">定制专属饲养建议</text>
+    </view>
+  </view>
+
+  <!-- 五行相生相克展示 -->
+  <view class="wuxing-section">
+    <view class="wuxing-title">五行相生相克</view>
+    
+    <!-- 五行图容器 -->
+    <view class="wuxing-container">
+      <image class="wuxing-image" src="../../images/wuxing.png" mode="aspectFit"></image>
+    </view>
+    
+
+  </view>
+
+  <!-- 开始按钮 -->
+  <view class="action-section">
+    <button class="start-btn active" bindtap="goToPetInfo">开始宠物命理</button>
+  </view>
+</view>

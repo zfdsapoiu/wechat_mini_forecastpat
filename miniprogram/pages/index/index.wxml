@@ -1,28 +1,25 @@
 <!--index.wxml-->
 <scroll-view class="scrollarea" scroll-y>
   <view class="container">
-    <!-- 用户信息区块 -->
-    <view class="userinfo">
-      <block wx:if="{{canIUseNicknameComp && !hasUserInfo}}">
-        <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-          <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
-        </button>
-        <view class="nickname-wrapper">
-          <text class="nickname-label">宠物名字</text>
-          <input type="nickname" class="nickname-input" placeholder="请输入宠物名字" bind:change="onInputChange" />
-        </view>
-      </block>
-      <block wx:elif="{{!hasUserInfo}}">
-        <button wx:if="{{canIUseGetUserProfile}}" bindtap="getUserProfile"> 获取头像昵称 </button>
-        <view wx:else> 请使用2.10.4及以上版本基础库 </view>
-      </block>
-      <block wx:else>
-        <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-      </block>
+    <!-- 页面标题 -->
+    <view class="page-title">
+      <text class="title-text">宠物信息输入</text>
+      <text class="subtitle-text">请填写您宠物的详细信息</text>
+    </view>
+    
+    <!-- 未登录提示 -->
+    <view wx:if="{{!hasUserInfo}}" class="userinfo">
+      <text class="login-tip">请先完成登录</text>
+      <button class="back-to-login-btn" bindtap="goToLogin">返回登录页</button>
     </view>
     <!-- 登录后显示的宠物信息输入区块 -->
     <block wx:if="{{hasUserInfo}}">
+      <!-- 宠物名字输入区块 -->
+      <view class="input-section">
+        <text class="section-title">🐾 宠物名字</text>
+        <input class="input" placeholder="请输入您宠物的名字" bindinput="bindPetNameInput" value="{{petName}}"></input>
+      </view>
+      
       <!-- 新增宠物信息输入区块 -->
       <view class="input-section">
         <text class="section-title">📅 宠物生日</text>
@@ -42,9 +39,9 @@
         <input class="input" placeholder="请输入宠物外贸特征" bindinput="bindFurTypeInput"></input>
       </view>
       
-      <!-- 算命按钮样式优化 -->
+      <!-- 开始分析按钮 -->
       <button class="pet-btn" bindtap="calculate">
-        开始算命
+        开始分析
       </button>
     </block>
     

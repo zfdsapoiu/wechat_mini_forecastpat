@@ -1,0 +1,61 @@
+<scroll-view class="scrollarea" scroll-y>
+  <view class="container">
+    <!-- 页面标题 -->
+    <view class="page-title">
+      <text class="title-text">用户中心</text>
+      <text class="subtitle-text">管理您的个人信息</text>
+    </view>
+    
+    <!-- 用户信息卡片 -->
+    <view class="user-card">
+      <!-- 头像区域 -->
+      <view class="avatar-section">
+        <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+          <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+          <view class="avatar-overlay">
+            <text class="avatar-tip">点击更换头像</text>
+          </view>
+        </button>
+      </view>
+      
+      <!-- 昵称区域 -->
+      <view class="nickname-section">
+        <text class="nickname-label">昵称</text>
+        <view class="nickname-content">
+          <input class="nickname-input" type="nickname" placeholder="点击设置昵称" value="{{userInfo.nickName}}" bindnicknamereview="onNicknameReview" maxlength="20"></input>
+          <text class="edit-icon">✏️</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 功能菜单 -->
+    <view class="menu-section">
+      <view class="menu-item" bindtap="viewRecords">
+        <view class="menu-icon">📝</view>
+        <view class="menu-content">
+          <text class="menu-title">算命记录</text>
+          <text class="menu-desc">查看历史算命结果</text>
+        </view>
+        <text class="menu-arrow">></text>
+      </view>
+      
+      <view class="menu-item" bindtap="clearRecords">
+        <view class="menu-icon">🗑️</view>
+        <view class="menu-content">
+          <text class="menu-title">清空记录</text>
+          <text class="menu-desc">删除所有算命记录</text>
+        </view>
+        <text class="menu-arrow">></text>
+      </view>
+      
+      <view class="menu-item" bindtap="aboutApp">
+        <view class="menu-icon">ℹ️</view>
+        <view class="menu-content">
+          <text class="menu-title">关于应用</text>
+          <text class="menu-desc">版本信息和帮助</text>
+        </view>
+        <text class="menu-arrow">></text>
+      </view>
+    </view>
+  </view>
+</scroll-view>

@@ -9,6 +9,18 @@ $RECYCLE.BIN/
 .Spotlight-V100
 .TemporaryItems
 .Trashes
+# AI Editor Configurations
+.augment-guidelines
+.clinerules/
+.comate/
+.cursor/
+.lingma/
+.roo/
+.rules/
+.trae/
+.windsurf/
+.mcp.json
+CLAUDE.md
 
 # Node.js
 node_modules/

@@ -1,16 +1,43 @@
 {
   "pages": [
+    "pages/login/login",
     "pages/index/index",
-    "pages/logs/logs",
-    "pages/result/result"
+    "pages/result/result",
+    "pages/records/records",
+    "pages/user/user"
   ],
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#667eea",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "宠物信息",
+        "iconPath": "images/tab-pet.png",
+        "selectedIconPath": "images/tab-pet-active.png"
+      },
+      {
+        "pagePath": "pages/records/records",
+        "text": "记录",
+        "iconPath": "images/tab-record.png",
+        "selectedIconPath": "images/tab-record-active.png"
+      },
+      {
+        "pagePath": "pages/user/user",
+        "text": "用户",
+        "iconPath": "images/tab-user.png",
+        "selectedIconPath": "images/tab-user-active.png"
+      }
+    ]
+  },
   "window": {
-    "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "Weixin",
-    "navigationBarBackgroundColor": "#ffffff"
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "宠物算命",
+    "navigationBarTextStyle": "black"
   },
   "style": "v2",
-  "componentFramework": "glass-easel",
-  "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "sitemapLocation": "sitemap.json"
 }

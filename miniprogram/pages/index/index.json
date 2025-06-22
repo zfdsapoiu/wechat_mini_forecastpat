@@ -1,4 +1,7 @@
 {
   "usingComponents": {
-  }
+  },
+  "navigationBarTitleText": "宠物信息输入",
+  "navigationBarBackgroundColor": "#667eea",
+  "navigationBarTextStyle": "white"
 }

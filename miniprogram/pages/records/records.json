@@ -1,0 +1,7 @@
+{
+  "usingComponents": {},
+  "navigationBarTitleText": "算命记录",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#667eea",
+  "backgroundTextStyle": "light"
+}
