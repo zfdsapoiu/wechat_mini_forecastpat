@@ -1,14 +1,7 @@
-# 项目背景
-这是一个利用宠物八字和样貌给宠物算命的程序。现在已经创建好了项目，请你基于目前情况进行开发。
+# CloudBase 项目
 
-# 功能 登录->输入信息->算命->查看结果
+基于云开发 + CloudBase AI ToolKit 构建的项目
 
-1.用户用微信登陆
-2.用户输入宠物八字
-3.用户输入宠物样貌
-4.用户点击算命按钮
-5.用户查看算命结果
+[![Powered by CloudBase](https://7463-tcb-advanced-a656fc-1257967285.tcb.qcloud.la/mcp/powered-by-cloudbase-badge.svg)](https://github.com/TencentCloudBase/CloudBase-AI-ToolKit)  
 
-# 项目要求
-1. 项目必须使用微信小程序开发
-2. 项目必须使用微信小程序云开发
+> 本项目基于 [**CloudBase AI ToolKit**](https://github.com/TencentCloudBase/CloudBase-AI-ToolKit) 开发，通过AI提示词和 MCP 协议+云开发，让开发更智能、更高效，支持AI生成全栈代码、一键部署至腾讯云开发（免服务器）、智能日志修复。
