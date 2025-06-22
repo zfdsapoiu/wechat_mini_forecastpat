@@ -2,114 +2,41 @@
   <view class="container">
     <!-- 页面标题 -->
     <view class="page-title">
-      <text class="title-text">算命记录</text>
-      <text class="subtitle-text">查看您的历史算命结果</text>
-    </view>
-    
-    <!-- 标签页导航 -->
-    <view class="tab-nav">
-      <view class="tab-item {{currentTab === 0 ? 'active' : ''}}" bindtap="switchTab" data-tab="0">
-        <text class="tab-text">宠物信息</text>
-      </view>
-      <view class="tab-item {{currentTab === 1 ? 'active' : ''}}" bindtap="switchTab" data-tab="1">
-        <text class="tab-text">命理分析</text>
-      </view>
-      <view class="tab-item {{currentTab === 2 ? 'active' : ''}}" bindtap="switchTab" data-tab="2">
-        <text class="tab-text">八字合盘</text>
-      </view>
+      <text class="title-text">宠物信息</text>
+      <text class="subtitle-text">查看您的宠物信息记录</text>
     </view>
     
     <!-- 宠物信息记录 -->
-    <view class="tab-content" wx:if="{{currentTab === 0}}">
-      <view class="records-list" wx:if="{{petInfoRecords.length > 0}}">
-        <view class="record-item" wx:for="{{petInfoRecords}}" wx:key="id" bindtap="viewPetInfo" data-index="{{index}}">
-          <view class="record-header">
-            <text class="pet-name">🐾 {{item.petName}}</text>
-            <text class="record-date">{{item.date}}</text>
+    <view class="records-list" wx:if="{{petInfoRecords.length > 0}}">
+      <view class="pet-card" wx:for="{{petInfoRecords}}" wx:key="id" bindtap="viewPetInfo" data-index="{{index}}">
+        <view class="pet-card-header">
+          <view class="pet-avatar">🐾</view>
+          <view class="pet-info">
+            <text class="pet-name">{{item.petName}}</text>
+            <text class="pet-breed">{{item.petData.petType || '未知品种'}}</text>
           </view>
-          <view class="pet-details">
-            <view class="detail-row">
-              <text class="detail-label">品种：</text>
-              <text class="detail-value">{{item.petData.petType || '未知'}}</text>
-            </view>
-            <view class="detail-row">
-              <text class="detail-label">生日：</text>
-              <text class="detail-value">{{item.petData.birthDate || '未知'}}</text>
-            </view>
-            <view class="detail-row">
-              <text class="detail-label">外观：</text>
-              <text class="detail-value">{{item.petData.petAppearance || '未知'}}</text>
-            </view>
-            <view class="detail-row">
-              <text class="detail-label">毛发：</text>
-              <text class="detail-value">{{item.petData.furType || '未知'}}</text>
-            </view>
-          </view>
-          <view class="record-footer">
-            <text class="view-detail">查看详情 ></text>
+          <view class="pet-date">
+            <text class="date-text">{{item.date}}</text>
           </view>
         </view>
-      </view>
-      
-      <!-- 空状态 -->
-      <view class="empty-state" wx:if="{{petInfoRecords.length === 0}}">
-        <text class="empty-icon">🐾</text>
-        <text class="empty-text">暂无宠物信息记录</text>
-        <text class="empty-tip">去给您的宠物算命吧！</text>
-        <button class="go-calculate-btn" bindtap="goToIndex">开始算命</button>
+        <view class="pet-card-body">
+          <view class="pet-summary">
+            <text class="summary-item">🎂 {{item.petData.birthDate || '未知生日'}}</text>
+            <text class="summary-item">✨ {{item.petData.petAppearance || '未知外观'}}</text>
+          </view>
+        </view>
+        <view class="pet-card-footer">
+          <text class="view-detail-btn">查看详情 ></text>
+        </view>
       </view>
     </view>
     
-    <!-- 宠物命理分析结果 -->
-    <view class="tab-content" wx:if="{{currentTab === 1}}">
-      <view class="records-list" wx:if="{{fortuneRecords.length > 0}}">
-        <view class="record-item" wx:for="{{fortuneRecords}}" wx:key="id" bindtap="viewFortune" data-index="{{index}}">
-          <view class="record-header">
-            <text class="pet-name">🔮 {{item.petName}}</text>
-            <text class="record-date">{{item.date}}</text>
-          </view>
-          <view class="record-preview">
-            <text class="preview-text">{{item.preview}}</text>
-          </view>
-          <view class="record-footer">
-            <text class="view-detail">查看详情 ></text>
-          </view>
-        </view>
-      </view>
-      
-      <!-- 空状态 -->
-      <view class="empty-state" wx:if="{{fortuneRecords.length === 0}}">
-        <text class="empty-icon">🔮</text>
-        <text class="empty-text">暂无命理分析记录</text>
-        <text class="empty-tip">去给您的宠物算命吧！</text>
-        <button class="go-calculate-btn" bindtap="goToIndex">开始算命</button>
-      </view>
-    </view>
-    
-    <!-- 宠物与主人八字合盘 -->
-    <view class="tab-content" wx:if="{{currentTab === 2}}">
-      <view class="records-list" wx:if="{{compatibilityRecords.length > 0}}">
-        <view class="record-item" wx:for="{{compatibilityRecords}}" wx:key="id" bindtap="viewCompatibility" data-index="{{index}}">
-          <view class="record-header">
-            <text class="pet-name">💕 {{item.petName}} & 主人</text>
-            <text class="record-date">{{item.date}}</text>
-          </view>
-          <view class="record-preview">
-            <text class="preview-text">{{item.preview}}</text>
-          </view>
-          <view class="record-footer">
-            <text class="view-detail">查看详情 ></text>
-          </view>
-        </view>
-      </view>
-      
-      <!-- 空状态 -->
-      <view class="empty-state" wx:if="{{compatibilityRecords.length === 0}}">
-        <text class="empty-icon">💕</text>
-        <text class="empty-text">暂无八字合盘记录</text>
-        <text class="empty-tip">敬请期待八字合盘功能！</text>
-        <button class="go-calculate-btn" bindtap="goToIndex" disabled>功能开发中</button>
-      </view>
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{petInfoRecords.length === 0}}">
+      <text class="empty-icon">🐾</text>
+      <text class="empty-text">暂无宠物信息记录</text>
+      <text class="empty-tip">去添加您的宠物信息吧！</text>
+      <button class="go-calculate-btn" bindtap="goToIndex">添加宠物</button>
     </view>
   </view>
 </scroll-view>

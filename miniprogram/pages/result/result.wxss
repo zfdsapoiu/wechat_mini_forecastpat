@@ -12,17 +12,6 @@
   min-height: 100%;
 }
 
-.back-button {
-  padding: 20rpx;
-  margin-bottom: 20rpx;
-}
-
-.back-text {
-  font-size: 32rpx;
-  color: #ff8a5c;
-  font-weight: bold;
-}
-
 .result-header {
   text-align: center;
   margin-bottom: 40rpx;

@@ -12,7 +12,7 @@ Page({
    */
   goToPetInfo() {
     wx.switchTab({
-      url: '/pages/index/index'
+      url: '/pages/petInfoInput/petInfoInput'
     });
   }
 });

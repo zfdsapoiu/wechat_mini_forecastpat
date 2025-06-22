@@ -1,9 +1,10 @@
 {
   "pages": [
     "pages/login/login",
-    "pages/index/index",
+    "pages/petInfoInput/petInfoInput",
     "pages/result/result",
     "pages/records/records",
+    "pages/petDetail/petDetail",
     "pages/user/user"
   ],
   "tabBar": {
@@ -13,7 +14,7 @@
     "borderStyle": "black",
     "list": [
       {
-        "pagePath": "pages/index/index",
+        "pagePath": "pages/petInfoInput/petInfoInput",
         "text": "宠物信息",
         "iconPath": "images/tab-pet.png",
         "selectedIconPath": "images/tab-pet-active.png"

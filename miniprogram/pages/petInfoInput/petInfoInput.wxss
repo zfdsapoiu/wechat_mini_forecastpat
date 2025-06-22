@@ -33,65 +33,6 @@
   color: #666;
 }
 
-.userinfo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 30rpx;
-  padding: 20rpx;
-  background-color: #ffffff;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
-  width: 100%;
-}
-
-/* 登录提示样式 */
-.login-tip {
-  color: #ff6b6b;
-  font-size: 32rpx;
-  padding: 20rpx;
-  background-color: #fff5f5;
-  border-radius: 10rpx;
-  border: 2rpx solid #ffebee;
-  margin-bottom: 20rpx;
-}
-
-/* 返回登录页按钮样式 */
-.back-to-login-btn {
-  background-color: #667eea;
-  color: white;
-  border-radius: 25rpx;
-  padding: 20rpx 40rpx;
-  font-size: 28rpx;
-  border: none;
-  margin-top: 20rpx;
-}
-
-.back-to-login-btn:hover {
-  background-color: #5a6fd8;
-}
-
-/* 移除了用户头像和昵称相关样式，这些功能已转移到登录页面 */
-
-.nickname-wrapper {
-  display: flex;
-  align-items: center;
-  margin-top: 20rpx;
-}
-
-.nickname-label {
-  margin-right: 10rpx;
-  font-size: 28rpx;
-  color: #555;
-}
-
-.nickname-input {
-  border: 1rpx solid #ddd;
-  padding: 10rpx 15rpx;
-  border-radius: 10rpx;
-  font-size: 28rpx;
-  flex-grow: 1;
-}
 
 .input-section, .pet-feature-section {
   width: 100%;
@@ -148,6 +89,25 @@
 
 .placeholder-style {
   color: #aaa;
+}
+
+/* 保存按钮样式 */
+.save-btn {
+  width: 80%;
+  background-color: #4CAF50; /* 绿色保存按钮 */
+  color: white;
+  border-radius: 50rpx;
+  padding: 20rpx 0;
+  font-size: 30rpx;
+  font-weight: bold;
+  margin-top: 20rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 10rpx rgba(76, 175, 80, 0.4);
+  transition: background-color 0.2s ease;
+}
+
+.save-btn:active {
+  background-color: #45a049; /* 点击效果 */
 }
 
 .pet-btn {

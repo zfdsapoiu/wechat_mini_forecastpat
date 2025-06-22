@@ -9,7 +9,7 @@ App({
     // 登录
     // 初始化云开发
     wx.cloud.init({
-      env: 'pet-fortune-xxxx', // 替换实际环境ID
+      env: 'cloud1-6gkx3gdpfdf31f5f', // 云开发环境ID
       traceUser: true
     })
     

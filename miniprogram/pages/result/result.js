@@ -6,43 +6,71 @@ Page({
     error: '',
     petName: '',
     petData: {},
+    petInfo: {},
     apiLogs: []
   },
 
   onLoad: function(options) {
     console.log('Result page loaded with options:', options);
     
-    if (options.petData) {
-      try {
-        const petData = JSON.parse(decodeURIComponent(options.petData));
-        console.log('Parsed pet data:', petData);
-        
-        this.setData({
-          petData: petData,
-          petName: petData.petName || '您的宠物',
-          loading: true
-        });
-        
-        // 调用算命API
-        this.callFortuneTellingAPI(petData);
-      } catch (error) {
-        console.error('解析宠物数据失败:', error);
-        this.setData({
-          error: '数据解析失败，请重试',
-          loading: false
-        });
-      }
-    } else {
+    // 从URL参数获取petName并解码
+    const petName = options.petName || '';
+    
+    if (!petName) {
       this.setData({
-        error: '缺少宠物数据',
+        error: '缺少宠物名称参数',
         loading: false
       });
+      return;
+    }
+    
+    console.log('解码后的petName:', petName);
+    
+    // 从本地缓存petInfoList中查找对应的petInfo
+    let petInfoList = wx.getStorageSync('petInfoList') || [];
+    let petInfo = petInfoList.find(item => 
+      item.petData && item.petData.petName === petName
+    );
+    
+    if (!petInfo) {
+      this.setData({
+        error: `未找到名为"${petName}"的宠物信息`,
+        loading: false
+      });
+      return;
+    }
+    
+    console.log('从本地缓存获取petInfo:', petInfo);
+    
+    this.setData({
+      petInfo: petInfo,
+      petData: petInfo.petData || {},
+      petName: petName
+    });
+    
+    // 检查calculated值决定是否需要调用API
+    if (petInfo.calculated === 1 && petInfo.output) {
+      // 已经计算过，直接展示结果
+      console.log('宠物已计算过，直接展示结果');
+      this.setData({
+        loading: false,
+        result: this.markdownToHtml(petInfo.output.result || petInfo.output)
+      });
+    } else {
+      // 需要调用API进行计算
+      console.log('宠物未计算过，调用API');
+      this.setData({
+        loading: true
+      });
+      this.callFortuneTellingAPI();
     }
   },
 
   // 调用算命API (阻塞模式)
   callFortuneTellingAPI: function() {
-    const petData = this.data.petData;
+    const petInfo = this.data.petInfo;
+    const petData = petInfo.petData || {};
+    console.log('petInfo:', petInfo); // 添加调试日志
     console.log('petData:', petData); // 添加调试日志
     
     // 构建API请求数据
@@ -118,13 +146,15 @@ Page({
           if (!result || typeof result !== 'string' || result.trim() === '') {
             result = '算命结果获取失败';
           }
+          
           this.setData({
             loading: false,
             result: this.markdownToHtml(result)
           });
           
-          // 保存算命记录
-          this.saveRecord(result);
+          // 更新petInfo并保存到本地存储
+          this.updatePetInfoAndSave(result);
+          
         } else {
           this.setData({
             loading: false,
@@ -284,6 +314,75 @@ Page({
     return html;
   },
 
+  // 更新petInfo并保存到本地存储
+  updatePetInfoAndSave: function(result) {
+    try {
+      const petInfo = this.data.petInfo;
+      
+      // 更新petInfo的calculated和output字段
+      petInfo.calculated = 1;
+      petInfo.output = {
+        result: result,
+        timestamp: Date.now(),
+        createTime: new Date().toISOString()
+      };
+      
+      // 更新页面数据
+      this.setData({
+        petInfo: petInfo
+      });
+      
+      // 获取现有的宠物信息列表
+      let petInfoList = wx.getStorageSync('petInfoList') || [];
+      
+      // 查找并更新对应的petInfo
+      const existingIndex = petInfoList.findIndex(item => 
+        item.id === petInfo.id || 
+        (item.petData && item.petData.petName === petInfo.petData.petName));
+      
+      if (existingIndex !== -1) {
+        // 更新现有记录
+        petInfoList[existingIndex] = petInfo;
+        
+        // 保存到本地存储
+        wx.setStorageSync('petInfoList', petInfoList);
+        
+        console.log('petInfo已更新并保存:', petInfo);
+      } else {
+        console.warn('未找到对应的petInfo记录进行更新');
+      }
+      
+      // 同时更新petInfoList中对应的记录
+      if (petInfo.petData && petInfo.petData.petName) {
+        const petName = petInfo.petData.petName;
+        
+        // 获取petInfoList
+        let petInfoList = wx.getStorageSync('petInfoList') || [];
+        
+        // 查找对应petName的记录并更新
+        const existingIndex = petInfoList.findIndex(item => 
+          item.petData && item.petData.petName === petName
+        );
+        
+        if (existingIndex !== -1) {
+          // 如果找到对应记录，更新calculated和output字段
+          petInfoList[existingIndex].calculated = petInfo.calculated;
+          petInfoList[existingIndex].output = petInfo.output;
+          
+          // 保存更新后的petInfoList
+          wx.setStorageSync('petInfoList', petInfoList);
+          
+          console.log('petInfoList中的记录已更新:', petName, petInfoList[existingIndex]);
+        } else {
+          console.log('在petInfoList中未找到对应的宠物记录:', petName);
+        }
+      }
+      
+    } catch (error) {
+      console.error('更新petInfo失败:', error);
+    }
+  },
+
   // 重试功能
   retry: function() {
     this.setData({
@@ -296,43 +395,6 @@ Page({
   // 返回上一页
   goBack: function() {
     wx.navigateBack();
-  },
-
-  // 保存算命记录
-  saveRecord: function(result) {
-    try {
-      const petData = this.data.petData;
-      const record = {
-        id: Date.now(), // 使用时间戳作为唯一ID
-        petName: petData.nickName || '未命名宠物',
-        petType: petData.petType || '',
-        birthDate: petData.birthDate || '',
-        appearance: petData.petAppearance || '',
-        furType: petData.furType || '',
-        result: result,
-        createTime: new Date().toISOString(),
-        createTimeFormatted: new Date().toLocaleString('zh-CN'),
-        timestamp: Date.now() // 添加时间戳字段
-      };
-      
-      // 获取现有记录
-      let records = wx.getStorageSync('petFortune_records') || [];
-      
-      // 添加新记录到开头
-      records.unshift(record);
-      
-      // 限制记录数量，最多保存100条
-      if (records.length > 100) {
-        records = records.slice(0, 100);
-      }
-      
-      // 保存到本地存储
-      wx.setStorageSync('petFortune_records', records);
-      
-      console.log('算命记录已保存:', record);
-    } catch (error) {
-      console.error('保存算命记录失败:', error);
-    }
   },
 
 

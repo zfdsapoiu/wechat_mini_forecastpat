@@ -1,4 +1,6 @@
 // pages/user/user.js
+const ContentChecker = require('../../utils/contentChecker');
+
 Page({
   /**
    * 页面的初始数据
@@ -6,7 +8,7 @@ Page({
   data: {
     userInfo: {
       avatarUrl: '',
-      nickName: ''
+      nickName: '微信用户'
     }
   },
 
@@ -42,17 +44,33 @@ Page({
   },
 
   /**
+   * 保存用户信息到本地缓存
+   */
+  saveUserInfo(userInfo) {
+    try {
+      wx.setStorageSync('petFortune_userInfo', userInfo);
+      console.log('用户信息保存成功:', userInfo);
+    } catch (error) {
+      console.error('保存用户信息失败:', error);
+      wx.showToast({
+        title: '保存失败',
+        icon: 'none'
+      });
+    }
+  },
+
+  /**
    * 选择头像 - 使用微信官方头像选择能力
    */
   onChooseAvatar(e) {
-    const { avatarUrl } = e.detail;
+    // const { avatarUrl } = e.detail;
     
-    // 更新头像
-    const userInfo = this.data.userInfo;
-    userInfo.avatarUrl = avatarUrl;
+    // // 更新头像
+    // const userInfo = this.data.userInfo;
+    // userInfo.avatarUrl = avatarUrl;
     
     this.setData({
-      userInfo: userInfo
+      userInfo: e.value.userInfo
     });
     
     // 保存到本地存储
@@ -65,49 +83,87 @@ Page({
   },
 
   /**
-   * 昵称审核完成 - 使用微信官方昵称输入能力
+   * 昵称输入事件
    */
-  onNicknameReview(e) {
-    const { pass, content } = e.detail;
+  onNicknameInput(e) {
+    const nickName = e.detail.value;
+    const userInfo = { ...this.data.userInfo };
+    userInfo.nickName = nickName;
     
-    if (pass) {
-      // 昵称审核通过，更新昵称
-      const userInfo = { ...this.data.userInfo };
-      userInfo.nickName = content;
+    this.setData({
+      userInfo: userInfo
+    });
+  },
+
+  /**
+   * 昵称输入框失去焦点事件
+   */
+  async onNicknameBlur(e) {
+    const nickName = e.detail.value.trim();
+    if (!nickName) {
+      return;
+    }
+    
+    try {
+      // 使用内容检测工具类
+      const result = await ContentChecker.checkNickname(nickName);
       
-      this.setData({
-        userInfo: userInfo
-      });
-      
-      // 保存到本地存储
-      this.saveUserInfo(userInfo);
-      
+      if (result.risky) {
+        // 内容有风险
+        ContentChecker.showResultToast(result, {
+          riskyMessage: '昵称包含敏感内容，请重新输入'
+        });
+        
+        // 清空昵称
+        const userInfo = { ...this.data.userInfo };
+        userInfo.nickName = '';
+        this.setData({
+          userInfo: userInfo
+        });
+      } else {
+        // 内容安全，保存昵称
+        this.saveUserInfo(this.data.userInfo);
+        wx.showToast({
+          title: '昵称设置成功',
+          icon: 'success'
+        });
+      }
+    } catch (error) {
+      console.error('昵称检测异常:', error);
+      // 异常情况下直接保存（降级处理）
+      this.saveUserInfo(this.data.userInfo);
       wx.showToast({
-        title: '昵称更新成功',
+        title: '昵称设置成功',
         icon: 'success'
-      });
-    } else {
-      // 昵称审核不通过
-      wx.showToast({
-        title: '昵称包含敏感内容',
-        icon: 'none'
       });
     }
   },
 
-
-
   /**
-   * 保存用户信息到本地存储
+   * 昵称审核回调（保留以防需要）
    */
-  saveUserInfo(userInfo) {
-    try {
-      wx.setStorageSync('petFortune_userInfo', userInfo);
-    } catch (error) {
-      console.error('保存用户信息失败:', error);
+  onNicknameReview(e) {
+    const { pass, timeout } = e.detail;
+    
+    if (!pass) {
       wx.showToast({
-        title: '保存失败',
+        title: timeout ? '昵称审核超时' : '昵称包含敏感内容',
         icon: 'none'
+      });
+      
+      // 清空昵称
+      const userInfo = { ...this.data.userInfo };
+      userInfo.nickName = '';
+      this.setData({
+        userInfo: userInfo
+      });
+    } else {
+      // 审核通过，保存昵称
+      this.saveUserInfo(this.data.userInfo);
+      
+      wx.showToast({
+        title: '昵称设置成功',
+        icon: 'success'
       });
     }
   },
@@ -122,21 +178,25 @@ Page({
   },
 
   /**
-   * 清空记录
+   * 清空所有记录
    */
   clearRecords() {
     wx.showModal({
       title: '确认清空',
-      content: '确定要清空所有算命记录吗？此操作不可恢复。',
-      confirmText: '清空',
-      confirmColor: '#ff6b6b',
+      content: '确定要清空所有宠物信息记录吗？此操作不可恢复。',
+      confirmText: '确定清空',
+      cancelText: '取消',
+      confirmColor: '#ff4757',
       success: (res) => {
         if (res.confirm) {
           try {
-            wx.removeStorageSync('petFortune_records');
+            // 清空本地存储的宠物信息列表
+            wx.removeStorageSync('petInfoList');
+            
             wx.showToast({
-              title: '记录已清空',
-              icon: 'success'
+              title: '清空成功',
+              icon: 'success',
+              duration: 2000
             });
           } catch (error) {
             console.error('清空记录失败:', error);

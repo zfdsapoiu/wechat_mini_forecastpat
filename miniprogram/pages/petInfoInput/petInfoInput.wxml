@@ -1,0 +1,45 @@
+<!--index.wxml-->
+<scroll-view class="scrollarea" scroll-y>
+  <view class="container">
+    <!-- 页面标题 -->
+    <view class="page-title">
+      <text class="title-text">宠物信息输入</text>
+      <text class="subtitle-text">请填写您宠物的详细信息</text>
+    </view>
+    
+    <!-- 宠物名字输入区块 -->
+    <view class="input-section">
+      <text class="section-title">🐾 宠物名字</text>
+      <input class="input" placeholder="请输入您宠物的名字" bindinput="bindPetNameInput" bindblur="onPetNameBlur" value="{{petName}}"></input>
+    </view>
+    
+    <!-- 新增宠物信息输入区块 -->
+    <view class="input-section">
+      <text class="section-title">📅 宠物生日</text>
+      <input class="input" placeholder="请输入宠物生日" bindinput="bindBirthDateInput" value="{{birthDate}}"></input>
+      <view class="input-tip">比如2020年1月1，10点01分出生的宠物就是'202001011001'，如果不知道时间就填写到日期</view>
+    </view>
+    
+    <!-- 宠物类型品种输入 -->
+    <view class="pet-feature">
+      <text class="section-title">🐶 宠物类型品种</text>
+      <input class="input" placeholder="请输入宠物类型品种" bindinput="bindPetTypeInput" value="{{petType}}"></input>
+    </view>
+    
+    <!-- 样貌输入增加宠物图标 -->
+    <view class="pet-feature">
+      <text class="section-title">🐾 外貌特征</text>
+      <input class="input" placeholder="请输入宠物外貌特征" bindinput="bindPetAppearanceInput" bindblur="onPetAppearanceBlur" value="{{petAppearance}}"></input>
+    </view>
+    
+    <!-- 保存宠物信息按钮 -->
+    <button class="save-btn" bindtap="savePetInfo">
+      💾 保存宠物信息
+    </button>
+    
+    <!-- 开始分析按钮 -->
+    <button class="pet-btn" bindtap="calculate">
+      开始分析
+    </button>
+  </view>
+</scroll-view>

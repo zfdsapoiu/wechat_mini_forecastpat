@@ -1,10 +1,6 @@
 <!--result.wxml-->
 <scroll-view class="scrollarea" scroll-y>
   <view class="container">
-    <!-- 返回按钮 -->
-    <view class="back-button" bindtap="goBack">
-      <text class="back-text">← 返回</text>
-    </view>
     
     <!-- 标题 -->
     <view class="result-header">

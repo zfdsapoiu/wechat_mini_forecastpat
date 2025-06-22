@@ -4,12 +4,11 @@ Page({
    * 页面的初始数据
    */
   data: {
-    currentTab: 1, // 当前标签页，默认显示命理分析
-    records: [], // 原始记录列表
-    petInfoRecords: [], // 宠物信息记录
-    fortuneRecords: [], // 命理分析记录
-    compatibilityRecords: [] // 八字合盘记录（暂时为空）
+    petInfoRecords: [] // 宠物信息记录
   },
+  
+  // 防抖标志，防止重复点击导致的卡顿
+  navigating: false,
 
   /**
    * 生命周期函数--监听页面加载
@@ -26,47 +25,43 @@ Page({
   },
 
   /**
-   * 加载算命记录
+   * 加载宠物信息记录
    */
   loadRecords() {
     try {
-      // 从新的存储键获取记录
-      const records = wx.getStorageSync('fortuneRecords') || [];
-      // 按时间倒序排列
-      records.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      // 从宠物信息存储键获取记录
+      const petInfoList = wx.getStorageSync('petInfoList') || [];
       
-      // 格式化记录数据
-      const formattedRecords = records.map((record, index) => {
-        const date = new Date(record.timestamp);
-        const formattedDate = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-        
-        // 提取结果预览（前50个字符）
-        let preview = record.result || '暂无结果';
-        if (preview.length > 50) {
-          preview = preview.substring(0, 50) + '...';
+      // 过滤并处理宠物信息记录
+      const validPetInfoList = petInfoList.filter(petInfo => {
+        // 确保记录是有效对象且包含基本信息
+        return petInfo && typeof petInfo === 'object' && petInfo.timestamp;
+      });
+      
+      validPetInfoList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      const formattedPetInfoRecords = validPetInfoList.map((petInfo, index) => {
+        // 安全处理时间戳
+        let formattedDate = '未知时间';
+        try {
+          const date = new Date(petInfo.timestamp);
+          if (!isNaN(date.getTime())) {
+            formattedDate = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+          }
+        } catch (dateError) {
+          console.warn('时间格式化失败:', petInfo.timestamp, dateError);
         }
         
         return {
-          id: record.id || index,
-          petName: record.petName || '未知宠物',
+          id: petInfo.id || index,
+          petName: (petInfo.petData && petInfo.petData.petName) || '未知宠物',
           date: formattedDate,
-          preview: preview,
-          result: record.result,
-          timestamp: record.timestamp,
-          petData: record.petData || {} // 保留完整的宠物数据
+          petData: petInfo.petData || {},
+          timestamp: petInfo.timestamp || new Date().toISOString()
         };
       });
       
-      // 分类处理记录
-      const petInfoRecords = formattedRecords.filter(record => record.petData && Object.keys(record.petData).length > 0);
-      const fortuneRecords = formattedRecords.filter(record => record.result);
-      const compatibilityRecords = []; // 暂时为空，等待八字合盘功能开发
-      
       this.setData({
-        records: formattedRecords,
-        petInfoRecords: petInfoRecords,
-        fortuneRecords: fortuneRecords,
-        compatibilityRecords: compatibilityRecords
+        petInfoRecords: formattedPetInfoRecords
       });
     } catch (error) {
       console.error('加载记录失败:', error);
@@ -78,66 +73,62 @@ Page({
   },
 
   /**
-   * 标签页切换
-   */
-  switchTab: function(e) {
-    const tab = parseInt(e.currentTarget.dataset.tab);
-    this.setData({
-      currentTab: tab
-    });
-  },
-
-  /**
-   * 查看宠物信息详情
+   * 查看宠物信息详情（优化版本，减少卡顿）
    */
   viewPetInfo: function(e) {
+    // 防抖处理，避免重复点击
+    if (this.navigating) {
+      return;
+    }
+    this.navigating = true;
+    
     const index = e.currentTarget.dataset.index;
     const record = this.data.petInfoRecords[index];
     
-    // 跳转到结果页面，显示宠物信息
-    const url = `/pages/result/result?fromRecord=true&petName=${encodeURIComponent(record.petName)}&fullResult=${encodeURIComponent(record.result || '')}&petData=${encodeURIComponent(JSON.stringify(record.petData))}`;
+    // 安全检查：确保记录存在
+    if (!record) {
+      console.error('记录不存在，索引:', index);
+      wx.showToast({
+        title: '记录不存在',
+        icon: 'none'
+      });
+      this.navigating = false;
+      return;
+    }
     
-    wx.navigateTo({
-      url: url
+    // 显示加载提示
+    wx.showLoading({
+      title: '加载中...',
+      mask: true
     });
-  },
-
-  /**
-   * 查看命理分析详情
-   */
-  viewFortune: function(e) {
-    const index = e.currentTarget.dataset.index;
-    const record = this.data.fortuneRecords[index];
     
-    // 跳转到结果页面，显示命理分析结果
-    const url = `/pages/result/result?fromRecord=true&petName=${encodeURIComponent(record.petName)}&fullResult=${encodeURIComponent(record.result)}&petData=${encodeURIComponent(JSON.stringify(record.petData))}`;
+    // 使用全局数据传递，避免URL参数过长导致的性能问题
+    const app = getApp();
+    app.globalData.currentPetDetail = {
+      petData: record.petData || {},
+      timestamp: record.timestamp || new Date().toISOString(),
+      date: record.date || '未知时间'
+    };
     
-    wx.navigateTo({
-      url: url
-    });
-  },
-
-  /**
-   * 查看八字合盘详情
-   */
-  viewCompatibility: function(e) {
-    const index = e.currentTarget.dataset.index;
-    const record = this.data.compatibilityRecords[index];
-    
-    // 暂时显示提示信息
-    wx.showToast({
-      title: '功能开发中',
-      icon: 'none'
-    });
-  },
-
-  /**
-   * 跳转到首页开始算命
-   */
-  goToIndex() {
-    wx.switchTab({
-      url: '/pages/index/index'
-    });
+    // 延迟跳转，确保数据设置完成
+    setTimeout(() => {
+      wx.navigateTo({
+        url: '/pages/petDetail/petDetail',
+        success: () => {
+          wx.hideLoading();
+          this.navigating = false;
+        },
+        fail: (err) => {
+          console.error('页面跳转失败:', err);
+          wx.hideLoading();
+          wx.showToast({
+            title: '跳转失败',
+            icon: 'none'
+          });
+          this.navigating = false;
+        }
+      });
+    }, 50); // 50ms延迟，给UI响应时间
   },
 
   /**

@@ -11,7 +11,7 @@
       <!-- 头像区域 -->
       <view class="avatar-section">
         <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
-          <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+          <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
           <view class="avatar-overlay">
             <text class="avatar-tip">点击更换头像</text>
           </view>
@@ -20,9 +20,8 @@
       
       <!-- 昵称区域 -->
       <view class="nickname-section">
-        <text class="nickname-label">昵称</text>
-        <view class="nickname-content">
-          <input class="nickname-input" type="nickname" placeholder="点击设置昵称" value="{{userInfo.nickName}}" bindnicknamereview="onNicknameReview" maxlength="20"></input>
+        <view class="nickname-container">
+          <input class="nickname-input" type="text" placeholder="请输入主人名字" value="{{userInfo.nickName}}" bindinput="onNicknameInput" bindblur="onNicknameBlur" />
           <text class="edit-icon">✏️</text>
         </view>
       </view>
@@ -57,5 +56,7 @@
         <text class="menu-arrow">></text>
       </view>
     </view>
+    
+
   </view>
 </scroll-view>

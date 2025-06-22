@@ -1,0 +1,76 @@
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <view class="back-btn" bindtap="goBack">
+      <text class="back-icon">‹</text>
+    </view>
+    <view class="page-title">
+      <text class="title-text">宠物详情</text>
+    </view>
+  </view>
+
+  <!-- 宠物信息卡片 -->
+  <view class="pet-detail-card" wx:if="{{petInfo}}">
+    <!-- 宠物头像和基本信息 -->
+    <view class="pet-header">
+      <view class="pet-avatar-large">🐾</view>
+      <view class="pet-basic-info">
+        <text class="pet-name-large">{{petName}}</text>
+        <text class="pet-breed">{{petData.petType || '未知品种'}}</text>
+        <text class="save-date">保存时间：{{date}}</text>
+      </view>
+    </view>
+
+    <!-- 详细信息 -->
+    <view class="pet-details">
+      <view class="detail-section">
+        <view class="section-title">
+          <text class="section-icon">📝</text>
+          <text class="section-text">基本信息</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">宠物姓名：</text>
+          <text class="detail-value">{{petName || '未填写'}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">宠物品种：</text>
+          <text class="detail-value">{{petData.petType || '未填写'}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">出生日期：</text>
+          <text class="detail-value">{{petData.birthDate || '未填写'}}</text>
+        </view>
+      </view>
+
+      <view class="detail-section" wx:if="{{petData.petAppearance}}">
+        <view class="section-title">
+          <text class="section-icon">✨</text>
+          <text class="section-text">外貌特征</text>
+        </view>
+        <view class="appearance-content">
+          <text class="appearance-text">{{petData.petAppearance}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <button class="edit-btn" bindtap="editPetInfo" data-test="edit">
+        <text class="btn-icon">✏️</text>
+        <text class="btn-text">修改信息</text>
+      </button>
+      <button class="fortune-btn" bindtap="goToFortune">
+        <text class="btn-icon">🔮</text>
+        <text class="btn-text">查看命理</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 数据为空的提示 -->
+  <view class="empty-state" wx:if="{{!petInfo}}">
+    <text class="empty-icon">😿</text>
+    <text class="empty-text">宠物信息不存在</text>
+    <text class="empty-tip">请返回重新选择</text>
+    <button class="go-back-btn" bindtap="goBack">返回</button>
+  </view>
+</view>
