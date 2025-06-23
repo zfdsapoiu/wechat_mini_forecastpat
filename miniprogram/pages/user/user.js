@@ -8,7 +8,7 @@ Page({
   data: {
     userInfo: {
       avatarUrl: '',
-      nickName: '微信用户'
+      nickName: ''
     }
   },
 
