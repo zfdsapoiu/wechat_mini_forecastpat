@@ -1,16 +1,9 @@
 /**
- * 宠物算命API调用工具类
- * 提供算命API调用、日志记录、日志管理等功能
+ * 宠物算命AI调用工具类
+ * 使用腾讯云开发内置的DeepSeek AI模型
  */
 class FortuneTellingAPI {
   constructor() {
-    // 从全局配置中获取API配置
-    const app = getApp();
-    const config = app.globalData.fortuneTellingConfig;
-    
-    this.apiUrl = config.apiUrl;
-    this.apiKey = config.apiKey;
-    this.responseMode = config.response_mode;
     this.logs = [];
     this.maxLogCount = 10; // 最大日志保存数量
     
@@ -19,229 +12,198 @@ class FortuneTellingAPI {
   }
 
   /**
-   * 调用阻塞模式API
-   * @param {Object} requestData - 请求数据
+   * 调用云开发AI模型进行算命
+   * @param {Object} petData - 宠物数据
    * @param {Function} onSuccess - 成功回调
    * @param {Function} onError - 失败回调
+   * @param {Function} onStreamChunk - 流式数据回调（可选）
+   * @param {Function} onStreamEnd - 流式结束回调（可选）
    */
-  callBlockingAPI(requestData, onSuccess, onError) {
-    wx.request({
-      url: this.apiUrl,
-      method: 'POST',
-      header: {
-        'Authorization': this.apiKey,
-        'Content-Type': 'application/json'
-      },
-      data: requestData,
-      success: (res) => {
-        console.log('API响应:', res);
-        
-        // 记录API调用日志
-        this.logApiCall(requestData, res, true);
-        
-        if (res.statusCode === 200 && res.data && res.data.data) {
-          // workflow API返回的结果在data.data中
-          const workflowData = res.data.data;
-          console.log('完整的workflowData:', JSON.stringify(workflowData, null, 2));
-          
-          let result = this.parseApiResult(workflowData);
-          
-          // 确保result是字符串且不为空
-          if (!result || typeof result !== 'string' || result.trim() === '') {
-            result = '算命结果获取失败';
-          }
-          
-          // 调用成功回调
-          if (onSuccess) {
-            onSuccess(result);
-          }
-          
-        } else {
-          const errorMsg = 'API调用失败，状态码: ' + res.statusCode + '，数据: ' + JSON.stringify(res.data);
-          if (onError) {
-            onError(errorMsg);
-          }
-        }
-      },
-      fail: (err) => {
-        console.error('API调用失败:', err);
-        
-        // 记录API调用日志
-        this.logApiCall(requestData, err, false);
-        
-        const errorMsg = '网络连接失败，请检查网络后重试';
-        if (onError) {
-          onError(errorMsg);
-        }
+  async callFortuneTellingAPI(petData, onSuccess, onError, onStreamChunk, onStreamEnd) {
+    try {
+      // 构建算命prompt
+      const prompt = this.buildFortunePrompt(petData);
+      
+      // 记录请求开始
+      const requestData = {
+        petData: petData,
+        prompt: prompt,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log('开始调用云开发AI模型:', requestData);
+      
+      // 创建DeepSeek模型实例
+      const model = wx.cloud.extend.AI.createModel("deepseek");
+      
+      if (onStreamChunk && onStreamEnd) {
+        // 流式调用
+        await this.callStreamingAI(model, prompt, requestData, onStreamChunk, onStreamEnd, onError);
+      } else {
+        // 阻塞式调用
+        await this.callBlockingAI(model, prompt, requestData, onSuccess, onError);
       }
-    });
+      
+    } catch (error) {
+      console.error('AI调用异常:', error);
+      this.logApiCall(petData, error, false);
+      if (onError) {
+        onError('AI服务调用失败: ' + error.message);
+      }
+    }
   }
 
   /**
-   * 调用流式模式API
-   * @param {Object} requestData - 请求数据
-   * @param {Function} onStreamChunk - 流式数据回调
-   * @param {Function} onStreamEnd - 流式结束回调
-   * @param {Function} onError - 失败回调
+   * 流式调用AI模型
    */
-  callStreamingAPI(requestData, onStreamChunk, onStreamEnd, onError) {
-    // 小程序不直接支持SSE，需要使用WebSocket或轮询方式
-    // 这里使用模拟的方式，实际项目中可能需要后端转换
-    console.log('流式模式暂不支持，降级为阻塞模式');
-    
-    // 临时降级为阻塞模式，但通过分段方式模拟流式输出
-    const blockingRequestData = {
-      ...requestData,
-      response_mode: 'blocking'
-    };
-    
-    wx.request({
-      url: this.apiUrl,
-      method: 'POST',
-      header: {
-        'Authorization': this.apiKey,
-        'Content-Type': 'application/json'
-      },
-      data: blockingRequestData,
-      success: (res) => {
-        console.log('API响应:', res);
-        
-        if (res.statusCode === 200 && res.data && res.data.data) {
-          const workflowData = res.data.data;
-          let result = this.parseApiResult(workflowData);
-          
-          if (result && typeof result === 'string' && result.trim() !== '') {
-            // 模拟流式输出，将结果分段发送
-            this.simulateStreamingOutput(result, onStreamChunk, onStreamEnd);
-          } else {
-            if (onError) {
-              onError('算命结果获取失败');
-            }
-          }
-        } else {
-          const errorMsg = 'API调用失败，状态码: ' + res.statusCode;
-          if (onError) {
-            onError(errorMsg);
-          }
-        }
-      },
-      fail: (err) => {
-        console.error('API调用失败:', err);
-        const errorMsg = '网络连接失败，请检查网络后重试';
-        if (onError) {
-          onError(errorMsg);
-        }
-      }
-    });
-  }
-
-  /**
-   * 模拟流式输出
-   * @param {String} fullText - 完整文本
-   * @param {Function} onStreamChunk - 流式数据回调
-   * @param {Function} onStreamEnd - 流式结束回调
-   */
-  simulateStreamingOutput(fullText, onStreamChunk, onStreamEnd) {
-    const chunkSize = 10; // 每次输出的字符数
-    let currentIndex = 0;
-    
-    const sendChunk = () => {
-      if (currentIndex < fullText.length) {
-        const chunk = fullText.slice(currentIndex, currentIndex + chunkSize);
-        currentIndex += chunkSize;
-        
+  async callStreamingAI(model, prompt, requestData, onStreamChunk, onStreamEnd, onError) {
+    try {
+      const res = await model.streamText({
+        data: {
+          model: "deepseek-r1-0528", // 使用deepseek-v3模型
+          messages: [
+            { role: "user", content: prompt }
+          ],
+        },
+      });
+      
+      let fullResult = '';
+      
+      // 接收流式响应
+      for await (let chunk of res.textStream) {
+        fullResult += chunk;
         if (onStreamChunk) {
           onStreamChunk(chunk);
         }
-        
-        // 延迟发送下一段，模拟打字机效果
-        setTimeout(sendChunk, 100);
-      } else {
-        // 流式输出结束
-        if (onStreamEnd) {
-          onStreamEnd();
-        }
       }
-    };
-    
-    sendChunk();
+      
+      // 清理DeepSeek返回结果中的引用标记
+      const cleanedResult = this.cleanDeepSeekResult(fullResult);
+      
+      // 记录成功日志
+      this.logApiCall(requestData, { result: cleanedResult }, true);
+      
+      if (onStreamEnd) {
+        onStreamEnd(cleanedResult);
+      }
+      
+    } catch (error) {
+      console.error('流式AI调用失败:', error);
+      this.logApiCall(requestData, error, false);
+      if (onError) {
+        onError('AI流式调用失败: ' + error.message);
+      }
+    }
   }
 
   /**
-   * 调用算命API
+   * 阻塞式调用AI模型
+   */
+  async callBlockingAI(model, prompt, requestData, onSuccess, onError) {
+    try {
+      const res = await model.generateText({
+        data: {
+          model: "deepseek-r1-0528", // 使用deepseek-v3模型
+          messages: [
+            { role: "user", content: prompt }
+          ],
+        },
+      });
+      
+      const result = res.text || '';
+      
+      // 清理DeepSeek返回结果中的引用标记
+      const cleanedResult = this.cleanDeepSeekResult(result);
+      
+      // 记录成功日志
+      this.logApiCall(requestData, { result: cleanedResult }, true);
+      
+      if (cleanedResult && cleanedResult.trim() !== '') {
+        if (onSuccess) {
+          onSuccess(cleanedResult);
+        }
+      } else {
+        if (onError) {
+          onError('AI返回结果为空');
+        }
+      }
+      
+    } catch (error) {
+      console.error('阻塞式AI调用失败:', error);
+      this.logApiCall(requestData, error, false);
+      if (onError) {
+        onError('AI调用失败: ' + error.message);
+      }
+    }
+  }
+
+  /**
+   * 清理DeepSeek返回结果中的引用标记
+   * @param {String} result - 原始结果
+   * @returns {String} 清理后的结果
+   */
+  cleanDeepSeekResult(result) {
+    if (!result || typeof result !== 'string') {
+      return result;
+    }
+    
+    // 去除开头和结尾的```markdown标记
+    let cleaned = result.replace(/^```markdown\s*\n?/i, '');
+    cleaned = cleaned.replace(/\n?```\s*$/i, '');
+    
+    // 去除开头和结尾的```标记（不带语言标识）
+    cleaned = cleaned.replace(/^```\s*\n?/, '');
+    cleaned = cleaned.replace(/\n?```\s*$/, '');
+    
+    // 去除开头和结尾的'''标记
+    cleaned = cleaned.replace(/^'''\s*\n?/, '');
+    cleaned = cleaned.replace(/\n?'''\s*$/, '');
+    
+    return cleaned.trim();
+  }
+
+  /**
+   * 构建算命prompt
    * @param {Object} petData - 宠物数据
-   * @param {Function} onSuccess - 成功回调（blocking模式）
-   * @param {Function} onError - 失败回调
-   * @param {Function} onStreamChunk - 流式数据回调（streaming模式）
-   * @param {Function} onStreamEnd - 流式结束回调（streaming模式）
+   * @returns {String} 完整的prompt
    */
-  callFortuneTellingAPI(petData, onSuccess, onError, onStreamChunk, onStreamEnd) {
-    console.log('petData:', petData); // 添加调试日志
+  buildFortunePrompt(petData) {
+    const { birth_date, pet_type, appearance } = petData;
     
-    // 构建API请求数据
-    const requestData = {
-      inputs: {
-        birth_date: petData.birthDate,
-        pet_type: petData.petType,
-        appearance: petData.petAppearance
-      },
-      response_mode: this.responseMode,
-      user: "pet_owner_" + Date.now()
-    };
-    console.log('requestData:', requestData); // 添加调试日志
+    // 读取算命prompt模板
+    const promptTemplate = `
+一、犬类八字理论重构
+时间单位调整
+以「月」为基本命理周期（人类1年≈犬类7年），将出生时间转换为「犬类四柱」
 
-    // 根据response_mode选择不同的处理方式
-    if (this.responseMode === 'streaming') {
-      this.callStreamingAPI(requestData, onStreamChunk, onStreamEnd, onError);
-    } else {
-      this.callBlockingAPI(requestData, onSuccess, onError);
-    }
-  }
+然后四柱对应的分析方向：
+年柱：犬类祖先基因及先天体质（对应品种遗传特征）
+月柱：核心性格与情感模式（参考犬种行为学）
+日柱：健康与寿命关键指标（结合鼻头颜色、耳型等面相特征）
+时柱：与主人缘分及家庭运势
 
-  /**
-   * 解析API返回结果
-   * @param {Object} workflowData - API返回的工作流数据
-   * @returns {String} 解析后的结果
-   */
-  parseApiResult(workflowData) {
-    let result = '';
+同时侧重考虑宠物宠物品种性格。
+也要考虑外貌特征，毛色对应的五行属性的影响
+
+输出：（注意每一项要详细分析，以下每一项不少于100字）
+1 宠物的四柱八字排列，命盘，结合貌特征的重点特征
+
+2 宠物的命理核心解析包括：1 性格特征 2健康 3整体运势发展
+
+3 基于宠物的命理核心的调理建议，包括：1 五行平衡 2品种特性优化 3风水布局
+
+4 宠物专属命名建议
+
+5 宠物生命周期关键节点，以表格呈现
+
+最后用升华的语言总结
+
+现在你要给这个狗狗测算命理，出生时间${birth_date}，狗狗类型为${pet_type}，狗狗外貌特征为${appearance}。请基于上面的方法给出这只狗狗的命理测算
+
+注意输出为markdown格式纯文本，不要输出多余的内容
+`;
     
-    // 根据实际数据结构，结果直接在outputs.output里
-    if (workflowData.outputs && workflowData.outputs.output) {
-      if (typeof workflowData.outputs.output === 'string') {
-        // 尝试解析为JSON获取answer字段
-        try {
-          const parsed = JSON.parse(workflowData.outputs.output);
-          if (parsed.answer && typeof parsed.answer === 'string') {
-            result = parsed.answer;
-            console.log('从outputs.output JSON中提取answer:', result.substring(0, 100) + '...');
-          } else {
-            // 如果不是JSON或没有answer字段，直接使用整个内容
-            result = workflowData.outputs.output;
-            console.log('使用完整的outputs.output内容');
-          }
-        } catch (e) {
-          // 如果不是JSON格式，直接使用整个内容
-          result = workflowData.outputs.output;
-          console.log('outputs.output不是JSON格式，使用完整内容');
-        }
-      } else {
-        result = '算命结果格式错误';
-        console.log('outputs.output不是字符串类型');
-      }
-    }
-    // 备用方案：直接查找answer字段
-    else if (workflowData.answer && typeof workflowData.answer === 'string') {
-      result = workflowData.answer;
-      console.log('找到直接的answer字段:', result);
-    }
-    // 如果都没找到，返回错误信息
-    else {
-      result = '算命结果获取失败';
-      console.log('未找到有效的answer字段');
-    }
-    
-    return result;
+    return promptTemplate;
   }
 
   /**
@@ -253,58 +215,44 @@ class FortuneTellingAPI {
   logApiCall(requestData, response, isSuccess) {
     const logEntry = {
       timestamp: new Date().toISOString(),
-      datetime: new Date().toLocaleString('zh-CN'),
+      request: requestData,
+      response: response,
       success: isSuccess,
-      request: {
-        url: this.apiUrl,
-        method: 'POST',
-        data: JSON.parse(JSON.stringify(requestData)) // 深拷贝避免引用问题
-      },
-      response: {
-        statusCode: response.statusCode || 'unknown',
-        data: JSON.parse(JSON.stringify(response.data || response)) // 深拷贝
-      }
+      type: 'cloudbase-ai'
     };
     
-    // 添加到日志数组
-    this.logs.push(logEntry);
+    this.logs.unshift(logEntry);
     
-    // 只保留最近指定数量的调用记录，避免内存占用过多
+    // 限制日志数量
     if (this.logs.length > this.maxLogCount) {
-      this.logs.shift();
+      this.logs = this.logs.slice(0, this.maxLogCount);
     }
     
-    // 同时输出到控制台，方便实时查看
-    console.log('=== API调用日志 ===');
-    console.log('时间:', logEntry.datetime);
-    console.log('成功:', logEntry.success);
-    console.log('请求:', logEntry.request);
-    console.log('响应:', logEntry.response);
-    console.log('==================');
-    
-    // 存储到本地缓存，方便持久化查看
+    // 保存到本地存储
     this.saveLogsToStorage();
+    
+    console.log('=== AI调用日志 ===');
+    console.log('请求:', requestData);
+    console.log('响应:', response);
+    console.log('成功:', isSuccess);
+    console.log('================');
   }
 
   /**
-   * 获取所有API调用日志
-   * @returns {Array} 日志数组
+   * 获取所有AI调用日志
    */
   getApiLogs() {
-    return this.logs || [];
+    return this.logs;
   }
 
   /**
-   * 清空API调用日志
+   * 清空AI调用日志
    */
   clearApiLogs() {
     this.logs = [];
-    try {
-      wx.removeStorageSync('api_debug_logs');
-    } catch (e) {
-      console.warn('清空本地日志失败:', e);
-    }
-    console.log('API调用日志已清空');
+    wx.removeStorageSync('ai_debug_logs');
+    
+    console.log('AI调用日志已清空');
   }
 
   /**
@@ -312,12 +260,13 @@ class FortuneTellingAPI {
    */
   loadLogsFromStorage() {
     try {
-      const storedLogs = wx.getStorageSync('api_debug_logs');
+      const storedLogs = wx.getStorageSync('ai_debug_logs');
       if (storedLogs && Array.isArray(storedLogs)) {
         this.logs = storedLogs;
       }
-    } catch (e) {
-      console.warn('从本地存储加载日志失败:', e);
+    } catch (error) {
+      console.error('加载日志失败:', error);
+      this.logs = [];
     }
   }
 
@@ -326,29 +275,9 @@ class FortuneTellingAPI {
    */
   saveLogsToStorage() {
     try {
-      wx.setStorageSync('api_debug_logs', this.logs);
-    } catch (e) {
-      console.warn('保存日志到本地存储失败:', e);
-    }
-  }
-
-  /**
-   * 设置API密钥
-   * @param {String} apiKey - API密钥
-   */
-  setApiKey(apiKey) {
-    this.apiKey = apiKey;
-  }
-
-  /**
-   * 设置最大日志保存数量
-   * @param {Number} maxCount - 最大数量
-   */
-  setMaxLogCount(maxCount) {
-    this.maxLogCount = maxCount;
-    // 如果当前日志数量超过新的最大值，则删除多余的日志
-    while (this.logs.length > this.maxLogCount) {
-      this.logs.shift();
+      wx.setStorageSync('ai_debug_logs', this.logs);
+    } catch (error) {
+      console.error('保存日志失败:', error);
     }
   }
 }
@@ -356,5 +285,5 @@ class FortuneTellingAPI {
 // 创建单例实例
 const fortuneTellingAPI = new FortuneTellingAPI();
 
-// 导出单例实例
+// 导出实例
 module.exports = fortuneTellingAPI;
