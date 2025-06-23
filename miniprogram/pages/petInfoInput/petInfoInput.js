@@ -274,6 +274,7 @@ Page({
           timestamp: Date.now(),
           createTime: new Date().toISOString(),
           createTimeFormatted: new Date().toLocaleString('zh-CN'),
+
           calculated:0,
           output: {}
         };
