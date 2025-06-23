@@ -61,7 +61,7 @@
       </button>
       <button class="fortune-btn" bindtap="goToFortune">
         <text class="btn-icon">🔮</text>
-        <text class="btn-text">查看命理</text>
+        <text class="btn-text">{{hasFortuneResult ? '查看命理' : '命理分析'}}</text>
       </button>
     </view>
   </view>

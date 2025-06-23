@@ -96,39 +96,58 @@ Page({
       return;
     }
     
-    // 显示加载提示
-    wx.showLoading({
-      title: '加载中...',
-      mask: true
-    });
-    
-    // 使用全局数据传递，避免URL参数过长导致的性能问题
-    const app = getApp();
-    app.globalData.currentPetDetail = {
-      petData: record.petData || {},
-      timestamp: record.timestamp || new Date().toISOString(),
-      date: record.date || '未知时间'
-    };
-    
-    // 延迟跳转，确保数据设置完成
-    setTimeout(() => {
-      wx.navigateTo({
-        url: '/pages/petDetail/petDetail',
-        success: () => {
-          wx.hideLoading();
-          this.navigating = false;
-        },
-        fail: (err) => {
-          console.error('页面跳转失败:', err);
-          wx.hideLoading();
-          wx.showToast({
-            title: '跳转失败',
-            icon: 'none'
-          });
-          this.navigating = false;
-        }
+    // 获取宠物名称
+    const petName = record.petData && record.petData.petName;
+    if (!petName) {
+      wx.showToast({
+        title: '宠物名称不存在',
+        icon: 'none'
       });
-    }, 50); // 50ms延迟，给UI响应时间
+      this.navigating = false;
+      return;
+    }
+    
+    // 直接跳转，通过URL参数传递petName
+    wx.navigateTo({
+      url: `/pages/petDetail/petDetail?petName=${petName}`,
+      success: () => {
+        this.navigating = false;
+      },
+      fail: (err) => {
+        console.error('页面跳转失败:', err);
+        wx.showToast({
+          title: '跳转失败',
+          icon: 'none'
+        });
+        this.navigating = false;
+      }
+    });
+  },
+
+  /**
+   * 跳转到宠物信息输入页面
+   */
+  goToIndex: function() {
+    // 防抖处理，避免重复点击
+    if (this.navigating) {
+      return;
+    }
+    this.navigating = true;
+    
+    wx.switchTab({
+      url: '/pages/petInfoInput/petInfoInput',
+      success: () => {
+        this.navigating = false;
+      },
+      fail: (err) => {
+        console.error('跳转到宠物信息输入页面失败:', err);
+        wx.showToast({
+          title: '跳转失败',
+          icon: 'none'
+        });
+        this.navigating = false;
+      }
+    });
   },
 
   /**

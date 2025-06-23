@@ -24,10 +24,9 @@
 
   <!-- 五行相生相克展示 -->
   <view class="wuxing-section">
-    <view class="wuxing-title">五行相生相克</view>
     
-    <!-- 五行图容器 -->
-    <view class="wuxing-container">
+  <!-- 五行图容器 -->
+  <view class="wuxing-container">
       <image class="wuxing-image" src="../../images/wuxing.png" mode="aspectFit"></image>
     </view>
     

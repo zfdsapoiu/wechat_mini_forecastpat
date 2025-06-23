@@ -3,44 +3,45 @@ Page({
     petInfo: null,
     petName: '',
     petData: {},
-    date: ''
+    date: '',
+    hasFortuneResult: false // 标记是否已有命理报告
   },
 
   onLoad: function(options) {
-    // 优化：优先从全局数据获取宠物信息，提升页面加载性能
-    const app = getApp();
-    let petInfo = null;
-    
-    // 首先尝试从全局数据获取（新的优化方式）
-    if (app.globalData && app.globalData.currentPetDetail) {
-      petInfo = app.globalData.currentPetDetail;
-      // 使用后清除全局数据，避免内存泄漏
-      delete app.globalData.currentPetDetail;
-    }
-    // 兼容旧版本：从URL参数获取（保持向后兼容）
-    else if (options.petInfo) {
-      try {
-        petInfo = JSON.parse(decodeURIComponent(options.petInfo));
-      } catch (error) {
-        console.error('解析宠物信息失败:', error);
-        wx.showToast({
-          title: '数据解析失败',
-          icon: 'error'
-        });
-        return;
-      }
+    // 从URL参数获取petName
+    const petName = options.petName;
+    if (!petName) {
+      wx.showToast({
+        title: '缺少宠物名称参数',
+        icon: 'none'
+      });
+      setTimeout(() => {
+        wx.navigateBack();
+      }, 1500);
+      return;
     }
     
-    // 设置页面数据
+    // 从缓存中获取petInfoList
+    const petInfoList = wx.getStorageSync('petInfoList') || [];
+    
+    // 根据petName查找对应的petInfo
+    const petInfo = petInfoList.find(item => {
+      return item.petData && item.petData.petName === petName;
+    });
+    
     if (petInfo) {
+      // 检查是否已有命理报告
+      const hasFortuneResult = !!(petInfo.calculated === 1 || (petInfo.output && petInfo.output.result));
+      
       this.setData({
         petInfo: petInfo,
-        petName: (petInfo.petData && petInfo.petData.petName) || '',
+        petName: petName,
         petData: petInfo.petData || {},
-        date: petInfo.date || ''
+        date: petInfo.date || '',
+        hasFortuneResult: hasFortuneResult
       });
     } else {
-      // 如果没有数据，返回上一页
+      // 如果没有找到对应的宠物信息
       wx.showToast({
         title: '未找到宠物信息',
         icon: 'none'

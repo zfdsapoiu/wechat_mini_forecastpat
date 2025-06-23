@@ -18,6 +18,12 @@ App({
     const _ = db.command
   },
   globalData: {
-    userInfo: null
+    userInfo: null,
+    // 算命API配置
+    fortuneTellingConfig: {
+      response_mode: "streaming", // streaming 或 blocking
+      apiUrl: 'https://api.dify.ai/v1/workflows/run',
+      apiKey: 'Bearer app-1h1qLpWylUg8NQBbtFYV3J2U'
+    }
   }
 })

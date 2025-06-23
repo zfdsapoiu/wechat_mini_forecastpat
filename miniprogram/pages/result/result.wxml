@@ -9,12 +9,15 @@
     
     <!-- 加载状态 -->
     <view class="loading" wx:if="{{loading}}">
-      <text class="loading-text">正在为您的宠物算命中...</text>
+      <text class="loading-text">{{isStreaming ? '正在为您的宠物算命中，结果将逐步显示...' : '正在为您的宠物算命中...'}}</text>
+      <view class="loading-dots" wx:if="{{isStreaming}}">💫</view>
     </view>
     
     <!-- 结果内容 -->
-    <view class="result-content" wx:if="{{!loading && result}}">
-      <rich-text nodes="{{result}}"></rich-text>
+    <view class="result-content" wx:if="{{(!loading && result) || (isStreaming && result)}}">
+      <markdown-renderer markdown="{{result}}"></markdown-renderer>
+      <!-- 流式输出时显示光标效果 -->
+      <view class="streaming-cursor" wx:if="{{isStreaming && loading}}">|</view>
     </view>
     
     <!-- 错误信息 -->

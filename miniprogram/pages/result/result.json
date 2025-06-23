@@ -2,5 +2,8 @@
   "navigationBarTitleText": "算命结果",
   "navigationBarBackgroundColor": "#ff8a5c",
   "navigationBarTextStyle": "white",
-  "backgroundColor": "#f0f0f0"
+  "backgroundColor": "#f0f0f0",
+  "usingComponents": {
+    "markdown-renderer": "../../components/markdown-renderer/index"
+  }
 }
