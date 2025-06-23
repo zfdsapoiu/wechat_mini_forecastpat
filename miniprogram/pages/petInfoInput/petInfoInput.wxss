@@ -94,16 +94,22 @@
 /* 保存按钮样式 */
 .save-btn {
   width: 80%;
+  height: 88rpx;
   background-color: #4CAF50; /* 绿色保存按钮 */
   color: white;
   border-radius: 50rpx;
-  padding: 20rpx 0;
+  border: none;
   font-size: 30rpx;
   font-weight: bold;
   margin-top: 20rpx;
   margin-bottom: 20rpx;
   box-shadow: 0 4rpx 10rpx rgba(76, 175, 80, 0.4);
   transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-sizing: border-box;
 }
 
 .save-btn:active {
@@ -112,15 +118,21 @@
 
 .pet-btn {
   width: 80%;
+  height: 88rpx;
   background-color: #ff8a5c; /* 宠物主题色 */
   color: white;
   border-radius: 50rpx; /* 圆角按钮 */
-  padding: 20rpx 0;
+  border: none;
   font-size: 32rpx;
   font-weight: bold;
   margin-top: 20rpx;
   box-shadow: 0 4rpx 10rpx rgba(255, 138, 92, 0.4);
   transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-sizing: border-box;
 }
 
 .pet-btn:active {

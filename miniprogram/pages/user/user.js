@@ -63,14 +63,14 @@ Page({
    * 选择头像 - 使用微信官方头像选择能力
    */
   onChooseAvatar(e) {
-    // const { avatarUrl } = e.detail;
+    const { avatarUrl } = e.detail;
     
-    // // 更新头像
-    // const userInfo = this.data.userInfo;
-    // userInfo.avatarUrl = avatarUrl;
+    // 更新头像
+    const userInfo = this.data.userInfo || {};
+    userInfo.avatarUrl = avatarUrl;
     
     this.setData({
-      userInfo: e.value.userInfo
+      userInfo: userInfo
     });
     
     // 保存到本地存储
