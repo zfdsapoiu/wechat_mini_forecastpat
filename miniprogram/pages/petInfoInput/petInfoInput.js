@@ -261,7 +261,30 @@ Page({
         return;
       }
       
+      // 调用云函数计算八字
+      let petBazi = '未知未知未知未知';
+      
+      // 异步计算八字，但不阻塞主流程
+      wx.cloud.callFunction({
+        name: 'calculateBazi',
+        data: {
+          birthDateTime: String(birthDate).trim()
+        }
+      }).then(baziResult => {
+         if (baziResult.result && baziResult.result.success) {
+           petBazi = baziResult.result.data.bazi;
+           console.log('八字计算成功:', petBazi);
+           // 更新已保存的宠物信息中的八字数据
+           this.updatePetBaziInStorage(petName, petBazi);
+         } else {
+           console.error('八字计算失败:', baziResult.result?.error || '未知错误');
+         }
+       }).catch(error => {
+         console.error('调用八字计算云函数失败:', error);
+       });
+      
       try {
+        
         // 构建宠物信息对象
         const petInfo = {
           id: String(petName).trim(), // 使用宠物名作为唯一ID
@@ -269,7 +292,8 @@ Page({
             petName: String(petName).trim(),
             birthDate: String(birthDate).trim(),
             petType: String(petType).trim(),
-            petAppearance: String(petAppearance).trim()
+            petAppearance: String(petAppearance).trim(),
+            petBazi: petBazi // 添加八字信息
           },
           timestamp: Date.now(),
           createTime: new Date().toISOString(),

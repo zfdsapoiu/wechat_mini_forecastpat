@@ -1,0 +1,11 @@
+{
+  "name": "paipanBazi",
+  "version": "1.0.0",
+  "description": "使用paipan库进行真太阳时八字排盘的云函数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  },
+  "author": "AI Assistant",
+  "license": "MIT"
+}

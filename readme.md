@@ -30,6 +30,14 @@
 - **云数据库** - 数据持久化存储
 - **微信内容安全API** - 内容审核服务
 
+### 万年历库
+- `paipan-lib/`: 完整的paipan万年历项目，支持农历公历干支历互转、八字排盘、大运推算、真太阳时等功能
+  - `js/paipan.js`: 核心万年历JavaScript库
+  - `js/paipan.gx.js`: 刑冲合害关系分析库
+  - `lib/class.paipan.php`: PHP版本万年历库
+  - `sxwnl/`: 寿星万年历源码和数据
+- `paipan-core.js`: 提取的核心万年历功能，用于云函数
+
 ### 核心工具类
 - **ContentChecker** - 统一的内容安全检测工具类
   - 支持昵称、评论等多种内容类型检测
@@ -44,6 +52,12 @@
   - 调用微信官方 `security.msgSecCheck` API
   - 支持文本内容安全检测
   - 返回标准化的检测结果
+- `calculateBazi` - 八字计算函数（已集成专业万年历库）
+  - 根据出生时间（yyyymmddhhmm格式）计算生辰八字
+  - 支持年柱、月柱、日柱、时柱的天干地支计算
+  - 返回对应的五行属性信息
+  - 为宠物运势预测提供基础数据
+- `fortuneTelling` - 算命云函数，基于八字进行运势分析
 
 ### 数据库集合
 - `pets` - 宠物信息存储
@@ -73,7 +87,10 @@ wechat_mini_forecastpat/
 │   ├── app.json                 # 小程序配置文件
 │   └── app.wxss                 # 全局样式文件
 ├── cloudfunctions/              # 云函数代码
-│   └── checkContent/           # 内容检测云函数
+│   ├── checkContent/           # 内容检测云函数
+│   │   ├── index.js            # 函数入口文件
+│   │   └── package.json        # 依赖配置
+│   └── calculateBazi/          # 八字计算云函数
 │       ├── index.js            # 函数入口文件
 │       └── package.json        # 依赖配置
 ├── project.config.json          # 项目配置文件
